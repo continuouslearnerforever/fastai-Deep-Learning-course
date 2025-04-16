@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "fastai-Deep-Learning-course"
+  site-url: "https://continuouslearnerforever.github.io/fastai-Deep-Learning-course"
+  description: "The practices and learning journey of following https://course.fast.ai/"
+  repo-branch: main
+  repo-url: "https://github.com/continuouslearnerforever/fastai-Deep-Learning-course"

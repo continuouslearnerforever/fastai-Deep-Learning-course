@@ -1,0 +1,89 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "fastai-Deep-Learning-course",
+    "section": "",
+    "text": "This file will become your README and also the index of your documentation.",
+    "crumbs": [
+      "fastai-Deep-Learning-course"
+    ]
+  },
+  {
+    "objectID": "index.html#developer-guide",
+    "href": "index.html#developer-guide",
+    "title": "fastai-Deep-Learning-course",
+    "section": "Developer Guide",
+    "text": "Developer Guide\nIf you are new to using nbdev here are some useful pointers to get you started.\n\nInstall fastai_Deep_Learning_course in Development mode\n# make sure fastai_Deep_Learning_course package is installed in development mode\n$ pip install -e .\n\n# make changes under nbs/ directory\n# ...\n\n# compile to have changes apply to fastai_Deep_Learning_course\n$ nbdev_prepare",
+    "crumbs": [
+      "fastai-Deep-Learning-course"
+    ]
+  },
+  {
+    "objectID": "index.html#usage",
+    "href": "index.html#usage",
+    "title": "fastai-Deep-Learning-course",
+    "section": "Usage",
+    "text": "Usage\n\nInstallation\nInstall latest from the GitHub repository:\n$ pip install git+https://github.com/continuouslearnerforever/fastai-Deep-Learning-course.git\nor from conda\n$ conda install -c continuouslearnerforever fastai_Deep_Learning_course\nor from pypi\n$ pip install fastai_Deep_Learning_course\n\n\nDocumentation\nDocumentation can be found hosted on this GitHub repository’s pages. Additionally you can find package manager specific guidelines on conda and pypi respectively.",
+    "crumbs": [
+      "fastai-Deep-Learning-course"
+    ]
+  },
+  {
+    "objectID": "index.html#how-to-use",
+    "href": "index.html#how-to-use",
+    "title": "fastai-Deep-Learning-course",
+    "section": "How to use",
+    "text": "How to use\nThis is the result os my practice and following the fast ai Practical Deep Learning for Coders",
+    "crumbs": [
+      "fastai-Deep-Learning-course"
+    ]
+  },
+  {
+    "objectID": "core.html",
+    "href": "core.html",
+    "title": "core",
+    "section": "",
+    "text": "foo\n\n foo ()"
+  },
+  {
+    "objectID": "00-is-it-a-bird-creating-a-model-from-your-own-data.html",
+    "href": "00-is-it-a-bird-creating-a-model-from-your-own-data.html",
+    "title": "Is it a bird?",
+    "section": "",
+    "text": "The resources related are as following: 1. Lesson 1 lecture 2. Deep Learning for Coders with Fastai and PyTorch: AI Applications Without a PhD Chapter 1 3. Course notebooks\nDetect if notebook is running on Kaggle\nIt’s a good idea to ensure you’re running the latest version of any libraries you need. !pip install -Uqq &lt;libraries&gt; upgrades to the latest version of\nimport os\niskaggle = os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '')\n\nif iskaggle:\n    print('Is running on Kaggle.')\n    !pip install -Uqq fastai",
+    "crumbs": [
+      "Is it a bird?"
+    ]
+  },
+  {
+    "objectID": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-1-download-images-of-birds-and-non-birds",
+    "href": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-1-download-images-of-birds-and-non-birds",
+    "title": "Is it a bird?",
+    "section": "Step 1: Download images of birds and non-birds",
+    "text": "Step 1: Download images of birds and non-birds\n\n# Skip this cell if you already have duckduckgo_search installed\n!pip install -Uqq duckduckgo_search\n!pip install -Uqq fastai\n!pip install fastdownload\n\nRequirement already satisfied: fastdownload in /home/jafar/miniconda3/lib/python3.12/site-packages (0.0.7)\nRequirement already satisfied: fastprogress in /home/jafar/miniconda3/lib/python3.12/site-packages (from fastdownload) (1.0.3)\nRequirement already satisfied: fastcore&gt;=1.3.26 in /home/jafar/miniconda3/lib/python3.12/site-packages (from fastdownload) (1.7.29)\nRequirement already satisfied: packaging in /home/jafar/miniconda3/lib/python3.12/site-packages (from fastcore&gt;=1.3.26-&gt;fastdownload) (24.2)\n\n\n\nfrom duckduckgo_search import DDGS \nfrom fastcore.all import *\n\ndef search_images(keywords, max_images=200): return L(DDGS().images(keywords, max_results=max_images)).itemgot('image')\n\nLet’s start by searching for a bird photo and seeing what kind of result we get. We’ll start by getting URLs from a search:\n\nurls = search_images('bird photos', max_images=1)\nurls[0]\n\n'https://images.pexels.com/photos/97533/pexels-photo-97533.jpeg?cs=srgb&dl=animal-avian-bird-97533.jpg&fm=jpg'\n\n\n…and then download a URL and take a look at it:\n\nfrom fastdownload import download_url\ndest = 'bird.jpg'\ndownload_url(urls[0], dest, show_progress=False)\n\nfrom fastai.vision.all import *\nim = Image.open(dest)\nim.to_thumb(256,256)\n\n\n\n\n\n\n\n\nNow let’s do the same with “forest photos”:\n\ndownload_url(search_images('forest photos', max_images=1)[0], 'forest.jpg', show_progress=False)\nImage.open('forest.jpg').to_thumb(256,256)\n\n\n\n\n\n\n\n\nOur searches seem to be giving reasonable results, so let’s grab 200 examples of each of “bird” and “forest” photos, and save each group of photos to a different folder:\n\nsearches = 'forest','bird'\npath = Path('bird_or_not')\n\nfor o in searches:\n    dest = (path/o)\n\n    if dest.exists():\n        print(f\"Directory '{dest}' already exists. Skipping search, download, and resize for '{o}'.\")\n        continue # Skip the rest of this loop iteration and move to the next search term\n        \n    dest.mkdir(exist_ok=True, parents=True)\n    results = search_images(f'{o} photo')\n    download_images(dest, urls=results[:200])\n    time.sleep(5)\n    resize_images(dest, max_size=400, dest=dest)\n\nDirectory 'bird_or_not/forest' already exists. Skipping search, download, and resize for 'forest'.\nDirectory 'bird_or_not/bird' already exists. Skipping search, download, and resize for 'bird'.",
+    "crumbs": [
+      "Is it a bird?"
+    ]
+  },
+  {
+    "objectID": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-2-train-our-model",
+    "href": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-2-train-our-model",
+    "title": "Is it a bird?",
+    "section": "Step 2: Train our model",
+    "text": "Step 2: Train our model\nSome photos might not download correctly which could cause our model training to fail, so we’ll remove them:\n\nfailed = verify_images(get_image_files(path))\nfailed.map(Path.unlink)\nlen(failed)\n\n/home/jafar/.local/lib/python3.10/site-packages/PIL/Image.py:3570: UserWarning: image file could not be identified because AVIF support not installed\n  warnings.warn(message)\n/home/jafar/.local/lib/python3.10/site-packages/PIL/Image.py:3570: UserWarning: image file could not be identified because AVIF support not installed\n  warnings.warn(message)\n/home/jafar/.local/lib/python3.10/site-packages/PIL/Image.py:3570: UserWarning: image file could not be identified because AVIF support not installed\n  warnings.warn(message)\n/home/jafar/.local/lib/python3.10/site-packages/PIL/Image.py:3570: UserWarning: image file could not be identified because AVIF support not installed\n  warnings.warn(message)\n/home/jafar/.local/lib/python3.10/site-packages/PIL/Image.py:3570: UserWarning: image file could not be identified because AVIF support not installed\n  warnings.warn(message)\n/home/jafar/.local/lib/python3.10/site-packages/PIL/Image.py:3570: UserWarning: image file could not be identified because AVIF support not installed\n  warnings.warn(message)\n/home/jafar/.local/lib/python3.10/site-packages/PIL/Image.py:3570: UserWarning: image file could not be identified because AVIF support not installed\n  warnings.warn(message)\n/home/jafar/.local/lib/python3.10/site-packages/PIL/Image.py:3570: UserWarning: image file could not be identified because AVIF support not installed\n  warnings.warn(message)\n/home/jafar/.local/lib/python3.10/site-packages/PIL/Image.py:3570: UserWarning: image file could not be identified because AVIF support not installed\n  warnings.warn(message)\n\n\n14\n\n\nTo train a model, we’ll need DataLoaders, which is an object that contains a training set (the images used to create a model) and a validation set (the images used to check the accuracy of a model – not used during training). In fastai we can create that easily using a DataBlock, and view sample images from it:\n\ndls = DataBlock(\n    blocks=(ImageBlock, CategoryBlock), \n    get_items=get_image_files, \n    splitter=RandomSplitter(valid_pct=0.2, seed=42),\n    get_y=parent_label,\n    item_tfms=[Resize(192, method='squish')]\n).dataloaders(path, bs=32)\n\ndls.show_batch(max_n=6)\n\n\n\n\n\n\n\n\n\nnum_bird_photos = len(get_image_files(path/'bird'))\nprint(f'{num_bird_photos} bird photos exist in dataset')\n\nnum_forest_photos = len(get_image_files(path/'forest'))\nprint(f'{num_forest_photos} forest photos exist in dataset')\n\n186 bird photos exist in dataset\n183 forest photos exist in dataset\n\n\nNow we’re ready to train our model. The fastest widely used computer vision model is resnet18. You can train this in a few minutes, even on a CPU! (On a GPU, it generally takes under 10 seconds…)\nfastai comes with a helpful fine_tune() method which automatically uses best practices for fine tuning a pre-trained model, so we’ll use that.\n\nlearn = vision_learner(dls, resnet18, metrics=error_rate)\nlearn.fine_tune(3)\n\n\n\n\n\n\n\n\nepoch\ntrain_loss\nvalid_loss\nerror_rate\ntime\n\n\n\n\n0\n0.455893\n0.168887\n0.095890\n01:14\n\n\n\n\n\n\n\n\n\n\n\n\nepoch\ntrain_loss\nvalid_loss\nerror_rate\ntime\n\n\n\n\n0\n0.040055\n0.001052\n0.000000\n01:05\n\n\n1\n0.025476\n0.000178\n0.000000\n01:23\n\n\n2\n0.017576\n0.000412\n0.000000\n01:03",
+    "crumbs": [
+      "Is it a bird?"
+    ]
+  },
+  {
+    "objectID": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-3-use-our-model-and-build-your-own",
+    "href": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-3-use-our-model-and-build-your-own",
+    "title": "Is it a bird?",
+    "section": "Step 3: Use our model (and build your own!)",
+    "text": "Step 3: Use our model (and build your own!)\nLet’s see what our model thinks about that bird we downloaded at the start:\n\nis_bird,_,probs = learn.predict(PILImage.create('bird.jpg'))\nprint(f\"This is a: {is_bird}.\")\nprint(f\"Probability it's a bird: {probs[0]:.4f}\")\n\n\n\n\n\n\n\n\nThis is a: bird.\nProbability it's a bird: 1.0000",
+    "crumbs": [
+      "Is it a bird?"
+    ]
+  }
+]
