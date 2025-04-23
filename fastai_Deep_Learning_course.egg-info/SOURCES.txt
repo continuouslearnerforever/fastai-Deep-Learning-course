@@ -1,0 +1,16 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+settings.ini
+setup.py
+fastai_Deep_Learning_course/__init__.py
+fastai_Deep_Learning_course/_modidx.py
+fastai_Deep_Learning_course/core.py
+fastai_Deep_Learning_course.egg-info/PKG-INFO
+fastai_Deep_Learning_course.egg-info/SOURCES.txt
+fastai_Deep_Learning_course.egg-info/dependency_links.txt
+fastai_Deep_Learning_course.egg-info/entry_points.txt
+fastai_Deep_Learning_course.egg-info/not-zip-safe
+fastai_Deep_Learning_course.egg-info/requires.txt
+fastai_Deep_Learning_course.egg-info/top_level.txt

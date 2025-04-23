@@ -1,0 +1,2 @@
+[nbdev]
+fastai_Deep_Learning_course = fastai_Deep_Learning_course._modidx:d
