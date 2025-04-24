@@ -20,3 +20,7 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+
+# image folders
+nbs/bears/
+nbs/bird_or_not/
