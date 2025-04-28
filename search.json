@@ -1,0 +1,232 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "fastai-Deep-Learning-course",
+    "section": "",
+    "text": "This file will become your README and also the index of your documentation.",
+    "crumbs": [
+      "fastai-Deep-Learning-course"
+    ]
+  },
+  {
+    "objectID": "index.html#developer-guide",
+    "href": "index.html#developer-guide",
+    "title": "fastai-Deep-Learning-course",
+    "section": "Developer Guide",
+    "text": "Developer Guide\nIf you are new to using nbdev here are some useful pointers to get you started.\n\nInstall fastai_Deep_Learning_course in Development mode\n# make sure fastai_Deep_Learning_course package is installed in development mode\n$ pip install -e .\n\n# make changes under nbs/ directory\n# ...\n\n# compile to have changes apply to fastai_Deep_Learning_course\n$ nbdev_prepare",
+    "crumbs": [
+      "fastai-Deep-Learning-course"
+    ]
+  },
+  {
+    "objectID": "index.html#usage",
+    "href": "index.html#usage",
+    "title": "fastai-Deep-Learning-course",
+    "section": "Usage",
+    "text": "Usage\n\nInstallation\nInstall latest from the GitHub repository:\n$ pip install git+https://github.com/continuouslearnerforever/fastai-Deep-Learning-course.git\nor from conda\n$ conda install -c continuouslearnerforever fastai_Deep_Learning_course\nor from pypi\n$ pip install fastai_Deep_Learning_course\n\n\nDocumentation\nDocumentation can be found hosted on this GitHub repository’s pages. Additionally you can find package manager specific guidelines on conda and pypi respectively.",
+    "crumbs": [
+      "fastai-Deep-Learning-course"
+    ]
+  },
+  {
+    "objectID": "index.html#how-to-use",
+    "href": "index.html#how-to-use",
+    "title": "fastai-Deep-Learning-course",
+    "section": "How to use",
+    "text": "How to use\nThis is the result os my practice and following the fast ai Practical Deep Learning for Coders",
+    "crumbs": [
+      "fastai-Deep-Learning-course"
+    ]
+  },
+  {
+    "objectID": "03-nlp.html",
+    "href": "03-nlp.html",
+    "title": "Natural Language (NLP)",
+    "section": "",
+    "text": "The resources related are as following:\nDetect if notebook is running on Kaggle\nIt’s a good idea to ensure you’re running the latest version of any libraries you need. !pip install -Uqq &lt;libraries&gt; upgrades to the latest version of\nimport os\niskaggle = os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '')\n\nif iskaggle:\n    print('Is running on Kaggle.')\n    !pip install -Uqq fastai",
+    "crumbs": [
+      "Natural Language (NLP)"
+    ]
+  },
+  {
+    "objectID": "03-nlp.html#nlp-for-absolute-beginners",
+    "href": "03-nlp.html#nlp-for-absolute-beginners",
+    "title": "Natural Language (NLP)",
+    "section": "NLP for absolute beginners",
+    "text": "NLP for absolute beginners\nIn this lecture, Jeremy explains the basics and foundations of NLP through the U.S. Patent Phrase to Phrase Matching Kaggle compettion.\nHe explains the simple usage of Pandas and numpy and HuggingFace Transformers while walking us through submission of the competition.\nHe also explains tokenization and the importance of selecting train and validation sets correctly and highlighted the reading of Dr. Rachel Thomas artcile How (and why) to create a good validation set\nThen Jeremy articulates Pearson correlation coefficient with a sample and explains what different values of r means with some visualizations of a real example.\nI’d like to suggest using modern chat bots such as google Gemini to ask them explain a subject clearly.\nFor enhancing the competition particication skills and basically improving the skills in ML development, Jeremy has developed another notebook walking us through the steps that he takes for iterating as quickly and easily as possible in submitting for that competition.",
+    "crumbs": [
+      "Natural Language (NLP)"
+    ]
+  },
+  {
+    "objectID": "02-nn-foundation.html",
+    "href": "02-nn-foundation.html",
+    "title": "Neural Network Foundations",
+    "section": "",
+    "text": "The resources related are as following:\n# Suppress only UserWarning\nimport warnings\n\nwarnings.filterwarnings('ignore', category=UserWarning)\nDetect if notebook is running on Kaggle\nIt’s a good idea to ensure you’re running the latest version of any libraries you need. !pip install -Uqq &lt;libraries&gt; upgrades to the latest version of\nimport os\niskaggle = os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '')\n\nif iskaggle:\n    print('Is running on Kaggle.')\n    !pip install -Uqq fastai",
+    "crumbs": [
+      "Neural Network Foundations"
+    ]
+  },
+  {
+    "objectID": "02-nn-foundation.html#choosing-the-best-image-model",
+    "href": "02-nn-foundation.html#choosing-the-best-image-model",
+    "title": "Neural Network Foundations",
+    "section": "Choosing the best image model",
+    "text": "Choosing the best image model\n\ntimm\nPyTorch Image Models (timm) is a wonderful library by Ross Wightman which provides state-of-the-art pre-trained computer vision models. It’s like Huggingface Transformers, but for computer vision instead of NLP (and it’s not restricted to transformers-based models)!\nRoss has been kind enough to help me understand how to best take advantage of this library by identifying the top models. I’m going to share here so of what I’ve learned from him, plus some additional ideas.\n\n\nThe data\nRoss regularly benchmarks new models as they are added to timm, and puts the results in a CSV in the project’s GitHub repo.\n\nimport pandas as pd\n\n# Load the results data first\ndf_results = pd.read_csv('image_model_results/results-imagenet.csv')\ndf_results['merge_key'] = df_results['model'].str.split('.', n=1).str[0]\n\ndef get_data(col):\n    # Load the benchmark data\n    df_bench = pd.read_csv('image_model_results/benchmark-infer-amp-nhwc-pt240-cu124-rtx4090.csv')   \n    df = df_bench.merge(df_results, left_on='model', right_on='merge_key', suffixes=('_bench', '_results'))    \n    \n    model_col_for_family = 'model_bench'\n    df['secs'] = 1. / df[col] \n    # Extract family based on the benchmark model name\n    df['family'] = df[model_col_for_family].str.extract('^([a-z]+?(?:v2)?)(?:\\d|_|$)')\n    # Filter out models ending in 'gn'\n    df = df[~df[model_col_for_family].str.endswith('gn')]\n    # Update family based on conditions (use the correct model column again)\n    df.loc[df[model_col_for_family].str.contains('in22', na=False),'family'] = df.loc[df[model_col_for_family].str.contains('in22', na=False),'family'] + '_in22'\n    df.loc[df[model_col_for_family].str.contains('resnet.*d', na=False),'family'] = df.loc[df[model_col_for_family].str.contains('resnet.*d', na=False),'family'] + 'd'\n\n    # filter based on the 'family' column    \n    if 'family' in df.columns and not df['family'].isnull().all():\n         df_filtered = df[df['family'].str.contains('^re[sg]netd?|beit|convnext|levit|efficient|vit|vgg|swin', na=False)]\n         return df_filtered\n    else:\n         print(\"Warning: 'family' column is missing or empty before final filtering.\")\n         return pd.DataFrame(columns=df.columns)\n\ndf = get_data('infer_samples_per_sec')\n\n\n\nInference results\nHere’s the results for inference performance (see the last section for training performance). In this chart:\n\nthe x axis shows how many seconds it takes to process one image (note: it’s a log scale)\nthe y axis is the accuracy on Imagenet\nthe size of each bubble is proportional to the size of images used in testing\nthe color shows what “family” the architecture is from.\n\nHover your mouse over a marker to see details about the model. Double-click in the legend to display just one family. Single-click in the legend to show or hide a family.\nNote: on my screen, Kaggle cuts off the family selector and some plotly functionality – to see the whole thing, collapse the table of contents on the right by clicking the little arrow to the right of “Contents”.\n\nimport plotly.express as px\nw,h = 1000,800\n\ndef show_all(df, title, size):\n    return px.scatter(df, width=w, height=h, size=df[size]**2, title=title,\n        x='secs',  y='top1', log_x=True, color='family', hover_name='merge_key', hover_data=[size])\n\n\nshow_all(df, 'Inference', 'infer_img_size')",
+    "crumbs": [
+      "Neural Network Foundations"
+    ]
+  },
+  {
+    "objectID": "02-nn-foundation.html#fitting-a-function-with-gradient-descent",
+    "href": "02-nn-foundation.html#fitting-a-function-with-gradient-descent",
+    "title": "Neural Network Foundations",
+    "section": "Fitting a function with gradient descent",
+    "text": "Fitting a function with gradient descent\nI cant express how much I enjoyed this part. Jeremy explained it very beautifully and simply that reduces the barrier for everyone. He walks us step by step toward understanding the details of NN foundations with simple and intuitive examples and visualizations. He breaks down the scary keywords and jargons with his clear explanations.\nThen he explains how a neural network approximates any given function and he shows the magic of multiple ReLU.\nThe most fastinating part of Jeremy’s lecture was the part that he showed he he made NN in Excel. I know Excel freaks love it but I think it shows how Jeremy mastered the concept that he can explain it so beautifully and make it memorable for everyone.\nFinally, I found Jeremy’s response to those who questioned him about what happens next after learning the basics and foundation of deep learning, importan and I bring it here completely.",
+    "crumbs": [
+      "Neural Network Foundations"
+    ]
+  },
+  {
+    "objectID": "02-nn-foundation.html#how-to-recognise-an-owl",
+    "href": "02-nn-foundation.html#how-to-recognise-an-owl",
+    "title": "Neural Network Foundations",
+    "section": "How to recognise an owl",
+    "text": "How to recognise an owl\nOK great, we’ve created a nifty little example showing that we can drawing squiggly lines that go through some points. So what?\nWell… the truth is that actually drawing squiggly lines (or planes, or high-dimensional hyperplanes…) through some points is literally all that deep learning does! If your data points are, say, the RGB values of pixels in photos of owls, then you can create an owl-recogniser model by following the exact steps above.\nStudents often ask me at this point “OK Jeremy, but how do neural nets actually work”. But at a foundational level, there is no “step 2”. We’re done – the above steps will, given enough time and enough data, create (for example) an owl recogniser, if you feed in enough owls (and non-owls).\nThe devil, I guess, is in the “given enough time and enough data” part of the above sentence. There’s a lot of tweaks we can make to reduce both of these things. For instance, instead of running our calculations on a normal CPU, as we’ve done above, we could do thousands of them simultaneously by taking advantage of a GPU. We could greatly reduce the amount of computation and data needed by using a convolution instead of a matrix multiplication, which basically means skipping over a bunch of the multiplications and additions for bits that you’d guess won’t be important. We could make things much faster if, instead of starting with random parameters, we start with parameters of someone else’s model that does something similar to what we want (this is called transfer learning).",
+    "crumbs": [
+      "Neural Network Foundations"
+    ]
+  },
+  {
+    "objectID": "01-saving-fastai-model-copy1.html",
+    "href": "01-saving-fastai-model-copy1.html",
+    "title": "Saving a bear classifier Model",
+    "section": "",
+    "text": "The resources related are as following: 1. Lesson 2 lecture 2. Deep Learning for Coders with Fastai and PyTorch: AI Applications Without a PhD Chapter 2 3. Course notebooks\n# Suppress only UserWarning\nimport warnings\n\nwarnings.filterwarnings('ignore', category=UserWarning)\nDetect if notebook is running on Kaggle\nIt’s a good idea to ensure you’re running the latest version of any libraries you need. !pip install -Uqq &lt;libraries&gt; upgrades to the latest version of\nimport os\niskaggle = os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '')\n\nif iskaggle:\n    print('Is running on Kaggle.')\n    !pip install -Uqq fastai",
+    "crumbs": [
+      "Saving a bear classifier Model"
+    ]
+  },
+  {
+    "objectID": "01-saving-fastai-model-copy1.html#step-1-download-images-of-bears",
+    "href": "01-saving-fastai-model-copy1.html#step-1-download-images-of-bears",
+    "title": "Saving a bear classifier Model",
+    "section": "Step 1: Download images of bears",
+    "text": "Step 1: Download images of bears\nIt is the same step as in first lesson with is it a bird classifier.\n\n# Skip this cell if you already have dependencies installed\n!pip install -Uqq duckduckgo_search &gt; /dev/null\n!pip install -Uqq fastai  &gt; /dev/null\n!pip install fastdownload  &gt; /dev/null\n!pip install ipywidgets &gt; /dev/null\n\n\nfrom duckduckgo_search import DDGS \nfrom fastcore.all import *\nfrom fastai.vision.widgets import *\n\ndef search_images(keywords, max_images=150): return L(DDGS().images(keywords, max_results=max_images)).itemgot('image')\n\nIt is a good practice to test each step. So, here we can test 1 bear image.\n\nfrom fastdownload import download_url\nfrom fastai.vision.all import *\nfrom pathlib import Path\n\nteddy_dest = 'teddy_bear.jpg'\nteddy_path = Path(teddy_dest)\n\nif not teddy_path.exists():\n    download_url(search_images('teddy bear', max_images=1)[0], teddy_dest, show_progress=False)\n\nImage.open(teddy_dest).to_thumb(256,256)\n\n\n\n\n\n\n\n\nThis seems to have worked nicely, so let’s use fastai’s download_images to download all the URLs for each of our search terms. We’ll put each in a separate folder:\n\nbear_types = 'grizzly','black','teddy'\npath = Path('bears')\n\nfor o in bear_types:\n    dest = (path/o)\n\n    if dest.exists():\n        print(f\"Directory '{dest}' already exists. Skipping search, download, and resize for '{o}'.\")\n        continue # Skip the rest of this loop iteration and move to the next search term\n        \n    dest.mkdir(exist_ok=True, parents=True)\n    results = search_images(f'{o} bear')\n    download_images(dest, urls=results[:200])\n    time.sleep(5)\n    resize_images(dest, max_size=400, dest=dest)\n\nDirectory 'bears/grizzly' already exists. Skipping search, download, and resize for 'grizzly'.\nDirectory 'bears/black' already exists. Skipping search, download, and resize for 'black'.\nDirectory 'bears/teddy' already exists. Skipping search, download, and resize for 'teddy'.",
+    "crumbs": [
+      "Saving a bear classifier Model"
+    ]
+  },
+  {
+    "objectID": "01-saving-fastai-model-copy1.html#step-2-train-our-model",
+    "href": "01-saving-fastai-model-copy1.html#step-2-train-our-model",
+    "title": "Saving a bear classifier Model",
+    "section": "Step 2: Train our model",
+    "text": "Step 2: Train our model\nSome photos might not download correctly which could cause our model training to fail, so we’ll remove them:\n\nfailed = verify_images(get_image_files(path))\nfailed.map(Path.unlink)\nlen(failed)\n\n0\n\n\nI like Jeremy’s approach which he starts training the model quickly and then optimizes for the quick and easy iterations and improvement. He starts by training the base model and uses then uses that for identifying the data issues in dataset. This approach simplifies the data cleaning by tone. It makes the data cleaning and augumentation straightforward and intuitive rather than abstract and scary.\nThat is why in the lecture, he imetiately trains the model with the minimum tricks as the baseline.\n\nbears = DataBlock(\n    blocks=(ImageBlock, CategoryBlock), \n    get_items=get_image_files, \n    splitter=RandomSplitter(valid_pct=0.2, seed=42),\n    get_y=parent_label,\n    item_tfms=Resize(128))\n\nThere are different resize methods which they influence the image representations.\nBy default Resize crops the images to fit a square shape of the size requested, using the full width or height. This can result in losing some important details.\n\nbears = bears.new(item_tfms=Resize(128, ResizeMethod.Crop))\ndls = bears.dataloaders(path)\ndls.valid.show_batch(max_n=4, nrows=1)\n\n\n\n\n\n\n\n\nAlternatively, you can ask fastai to squish/stretch them:\n\nbears = bears.new(item_tfms=Resize(128, ResizeMethod.Squish))\ndls = bears.dataloaders(path)\ndls.valid.show_batch(max_n=4, nrows=1)\n\n\n\n\n\n\n\n\nOr ask fastai to pad the images with zeros (black):\n\nbears = bears.new(item_tfms=Resize(128, ResizeMethod.Pad, pad_mode='zeros'))\ndls = bears.dataloaders(path)\ndls.valid.show_batch(max_n=4, nrows=1)\n\n\n\n\n\n\n\n\nHere’s another example where we replace Resize with RandomResizedCrop, which is the transform that provides the behavior we just described. The most important parameter to pass in is min_scale, which determines how much of the image to select at minimum each time:\n\nbears = bears.new(item_tfms=RandomResizedCrop(128, min_scale=0.3))\ndls = bears.dataloaders(path)\ndls.train.show_batch(max_n=4, nrows=1, unique=True)",
+    "crumbs": [
+      "Saving a bear classifier Model"
+    ]
+  },
+  {
+    "objectID": "01-saving-fastai-model-copy1.html#data-augmentation",
+    "href": "01-saving-fastai-model-copy1.html#data-augmentation",
+    "title": "Saving a bear classifier Model",
+    "section": "Data Augmentation",
+    "text": "Data Augmentation\nData augmentation refers to creating random variations of our input data, such that they appear different, but do not actually change the meaning of the data. Examples of common data augmentation techniques for images are rotation, flipping, perspective warping, brightness changes and contrast changes. For natural photo images such as the ones we are using here, a standard set of augmentations that we have found work pretty well are provided with the aug_transforms function. Because our images are now all the same size, we can apply these augmentations to an entire batch of them using the GPU, which will save a lot of time. To tell fastai we want to use these transforms on a batch, we use the batch_tfms parameter (note that we’re not using RandomResizedCrop in this example, so you can see the differences more clearly; we’re also using double the amount of augmentation compared to the default, for the same reason):\n\nbears = bears.new(item_tfms=Resize(128), batch_tfms=aug_transforms(mult=2))\ndls = bears.dataloaders(path)\ndls.train.show_batch(max_n=8, nrows=2, unique=True)",
+    "crumbs": [
+      "Saving a bear classifier Model"
+    ]
+  },
+  {
+    "objectID": "01-saving-fastai-model-copy1.html#train-our-model",
+    "href": "01-saving-fastai-model-copy1.html#train-our-model",
+    "title": "Saving a bear classifier Model",
+    "section": "Train our model",
+    "text": "Train our model\nTime to use the same lines of code as in first notebook to train our bear classifier.\nWe don’t have a lot of data for our problem (150 pictures of each sort of bear at most), so to train our model, we’ll use RandomResizedCrop with an image size of 224 px, which is fairly standard for image classification, and default aug_transforms:\n\nbears = bears.new(\n    item_tfms=RandomResizedCrop(224, min_scale=0.5),\n    batch_tfms=aug_transforms())\ndls = bears.dataloaders(path)\n\nWe can now create our Learner and fine-tune it in the usual way:\n\n# Check if the model is trained before, we just load it.\nmodel_path= Path('bear.pkl')\nmodel_existed=False\n\nif model_path.exists():\n    print(f\"Loading existing model weights from: {model_path}\")\n    # Load the saved weights into the existing learner structure\n    learn = load_learner('bear.pkl')    \n    learn.dls = dls\n        \n    model_existed=True\nelse:\n    learn = vision_learner(dls, resnet18, metrics=error_rate)\n    learn.fine_tune(4)\n    model_existed= False\n\nLoading existing model weights from: bear.pkl",
+    "crumbs": [
+      "Saving a bear classifier Model"
+    ]
+  },
+  {
+    "objectID": "01-saving-fastai-model-copy1.html#investigate-the-model",
+    "href": "01-saving-fastai-model-copy1.html#investigate-the-model",
+    "title": "Saving a bear classifier Model",
+    "section": "Investigate the model",
+    "text": "Investigate the model\nIn order to analyze the mistakes that model is making, one way is visualizing it. To visualize this, we can create a confusion matrix:\n\ninterp = ClassificationInterpretation.from_learner(learn)\ninterp.plot_confusion_matrix()\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe rows represent all the black, grizzly, and teddy bears in our dataset, respectively. The columns represent the images which the model predicted as black, grizzly, and teddy bears, respectively. Therefore, the diagonal of the matrix shows the images which were classified correctly, and the off-diagonal cells represent those which were classified incorrectly. This is one of the many ways that fastai allows you to view the results of your model. It is (of course!) calculated using the validation set. With the color-coding, the goal is to have white everywhere except the diagonal, where we want dark blue. Our bear classifier isn’t making many mistakes!\nIt’s helpful to see where exactly our errors are occurring, to see whether they’re due to a dataset problem (e.g., images that aren’t bears at all, or are labeled incorrectly, etc.), or a model problem (perhaps it isn’t handling images taken with unusual lighting, or from a different angle, etc.). To do this, we can sort our images by their loss.\nThe loss is a number that is higher if the model is incorrect (especially if it’s also confident of its incorrect answer), or if it’s correct, but not confident of its correct answer. In a couple of chapters we’ll learn in depth how loss is calculated and used in the training process. For now, plot_top_losses shows us the images with the highest loss in our dataset. As the title of the output says, each image is labeled with four things: prediction, actual (target label), loss, and probability. The probability here is the confidence level, from zero to one, that the model has assigned to its prediction:\n\ninterp.plot_top_losses(5, nrows=1)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe intuitive approach to doing data cleaning is to do it before you train a model. But as you’ve seen in this case, a model can actually help you find data issues more quickly and easily. So, we normally prefer to train a quick and simple model first, and then use it to help us with data cleaning.\nfastai includes a handy GUI for data cleaning called ImageClassifierCleaner that allows you to choose a category and the training versus validation set and view the highest-loss images (in order), along with menus to allow images to be selected for removal or relabeling:\n\n#hide_output\nif not model_existed:\n    cleaner = ImageClassifierCleaner(learn)\n    cleaner",
+    "crumbs": [
+      "Saving a bear classifier Model"
+    ]
+  },
+  {
+    "objectID": "01-saving-fastai-model-copy1.html#turning-the-model-into-an-online-application",
+    "href": "01-saving-fastai-model-copy1.html#turning-the-model-into-an-online-application",
+    "title": "Saving a bear classifier Model",
+    "section": "Turning the Model into an Online Application",
+    "text": "Turning the Model into an Online Application\n\nUsing the Model for Inference\nOnce you’ve got a model you’re happy with, you need to save it, so that you can then copy it over to a server where you’ll use it in production. Remember that a model consists of two parts: the architecture and the trained parameters. The easiest way to save the model is to save both of these, because that way when you load a model you can be sure that you have the matching architecture and parameters. To save both parts, use the export method.\nThis method even saves the definition of how to create your DataLoaders. This is important, because otherwise you would have to redefine how to transform your data in order to use your model in production. fastai automatically uses your validation set DataLoader for inference by default, so your data augmentation will not be applied, which is generally what you want.\nWhen you call export, fastai will save a file called “export.pkl”:\n\nif not model_existed:\n    learn.export('bear.pkl')\n\nFor now, let’s try to create a simple app within our notebook.\nWhen we use a model for getting predictions, instead of training, we call it inference. To create our inference learner from the exported file, we use load_learner (in this case, this isn’t really necessary, since we already have a working Learner in our notebook; we’re just doing for demonstrating the end-to-end process):\n\nif model_existed:    \n    learn_inf = learn\nelse:\n    learn_inf = load_learner('bear.pkl')\n\nWhen we’re doing inference, we’re generally just getting predictions for one image at a time. To do this, pass a filename to predict:\n\nlearn_inf.predict('teddy_bear.jpg')\n\n\n\n\n\n\n\n\n('teddy', tensor(2), tensor([4.8577e-08, 9.9890e-08, 1.0000e+00]))\n\n\nThis has returned three things: the predicted category in the same format you originally provided (in this case that’s a string), the index of the predicted category, and the probabilities of each category. The last two are based on the order of categories in the vocab of the DataLoaders; that is, the stored list of all possible categories. At inference time, you can access the DataLoaders as an attribute of the Learner:\n\nlearn_inf.dls.vocab\n\n['black', 'grizzly', 'teddy']\n\n\nWe can see here that if we index into the vocab with the integer returned by predict then we get back “teddy,” as expected. Also, note that if we index into the list of probabilities, we see a nearly 1.00 probability that this is a teddy bear.\nWe know how to make predictions from our saved model, so we have everything we need to start building our app. We can do it directly in a Jupyter notebook.\n\n\nCreating a Notebook App from the Model\nTo use our model in an application, we can simply treat the predict method as a regular function. Therefore, creating an app from the model can be done using any of the myriad of frameworks and techniques available to application developers.\nHowever, most data scientists are not familiar with the world of web application development. So let’s try using something that you do, at this point, know: it turns out that we can create a complete working web application using nothing but Jupyter notebooks!\n\nIPython widgets (ipywidgets)\n\nIPython widgets are GUI components that bring together JavaScript and Python functionality in a web browser, and can be created and used within a Jupyter notebook. For instance, the image cleaner that we saw earlier in this chapter is entirely written with IPython widgets. However, we don’t want to require users of our application to run Jupyter themselves.\nBut we still have the advantage of developing in a notebook, so with ipywidgets, we can build up our GUI step by step. We will use this approach to create a simple image classifier. First, we need a file upload widget:\n\nbtn_upload = widgets.FileUpload(accept='image/*', multiple=False)\nbtn_run = widgets.Button(description='Classify')\nout_pl = widgets.Output()\nlbl_pred = widgets.Label()\n\ndef on_click_classify(change):\n    img = None\n    if not btn_upload.value:\n        out_pl.clear_output()\n        with out_pl:\n            print(\"Please upload an image first.\")\n        lbl_pred.value = \"\"\n        return\n\n    try:        \n        uploaded_file_info = btn_upload.value[0]        \n        image_content_memoryview = uploaded_file_info['content']\n        \n        image_bytes = image_content_memoryview.tobytes()        \n        img = PILImage.create(image_bytes)\n\n    except Exception as e:\n        out_pl.clear_output()\n        with out_pl:\n            print(f\"Error loading image: {e}\")\n        lbl_pred.value = \"\"\n        return\n    \n    out_pl.clear_output()\n    with out_pl:\n        display(img.to_thumb(128,128))\n\n    pred, pred_idx, probs = learn_inf.predict(img)   \n    lbl_pred.value = f'Prediction: {pred}; Probability: {probs[pred_idx]:.04f}'\n\nbtn_run.on_click(on_click_classify)\n\ndisplay(widgets.VBox([widgets.Label('Select your bear!'),\n                      btn_upload, btn_run, out_pl, lbl_pred]))",
+    "crumbs": [
+      "Saving a bear classifier Model"
+    ]
+  },
+  {
+    "objectID": "01-saving-fastai-model-copy1.html#serving-model-in-hugging-face-space",
+    "href": "01-saving-fastai-model-copy1.html#serving-model-in-hugging-face-space",
+    "title": "Saving a bear classifier Model",
+    "section": "Serving model in Hugging face Space",
+    "text": "Serving model in Hugging face Space\nThis is a quick and easy way to serve the model for testing and serve it as Prototype. Mostly it can be free as the model can be served using free CPU. There is a good integration with Gradio UI which makes it easier.\nI pushed the model to this space: Bear Classifier\nI found it very smooth and delightful experience of training the model and inspecting it. Then I prefer to serve it using Gradio UI for testing and verification as Prototype rather than using IPython widgets.\nServing the model via HF, has another advantage that simply it will be available via API. This is useful especially if the plan is to integerate the model serving inside an existing application or integrate it in a modern frontend application.",
+    "crumbs": [
+      "Saving a bear classifier Model"
+    ]
+  },
+  {
+    "objectID": "01-saving-fastai-model-copy1.html#how-to-avoid-disaster",
+    "href": "01-saving-fastai-model-copy1.html#how-to-avoid-disaster",
+    "title": "Saving a bear classifier Model",
+    "section": "How to Avoid Disaster",
+    "text": "How to Avoid Disaster\nI found this section very important and wanted to repeat it again from the book.\nIn practice, a deep learning model will be just one piece of a much bigger system. As we discussed at the start of this chapter, a data product requires thinking about the entire end-to-end process, from conception to use in production. In this book, we can’t hope to cover all the complexity of managing deployed data products, such as managing multiple versions of models, A/B testing, canarying, refreshing the data (should we just grow and grow our datasets all the time, or should we regularly remove some of the old data?), handling data labeling, monitoring all this, detecting model rot, and so forth. In this section we will give an overview of some of the most important issues to consider; for a more detailed discussion of deployment issues we refer to you to the excellent Building Machine Learning Powered Applications by Emmanuel Ameisen (O’Reilly)\nOne of the biggest issues to consider is that understanding and testing the behavior of a deep learning model is much more difficult than with most other code you write. With normal software development you can analyze the exact steps that the software is taking, and carefully study which of these steps match the desired behavior that you are trying to create. But with a neural network the behavior emerges from the model’s attempt to match the training data, rather than being exactly defined.\nThis can result in disaster! For instance, let’s say we really were rolling out a bear detection system that will be attached to video cameras around campsites in national parks, and will warn campers of incoming bears. If we used a model trained with the dataset we downloaded there would be all kinds of problems in practice, such as:\n\nWorking with video data instead of images\nHandling nighttime images, which may not appear in this dataset\nDealing with low-resolution camera images\nEnsuring results are returned fast enough to be useful in practice\nRecognizing bears in positions that are rarely seen in photos that people post online (for example from behind, partially covered by bushes, or when a long way away from the camera)\n\nA big part of the issue is that the kinds of photos that people are most likely to upload to the internet are the kinds of photos that do a good job of clearly and artistically displaying their subject matter—which isn’t the kind of input this system is going to be getting. So, we may need to do a lot of our own data collection and labelling to create a useful system.\nThis is just one example of the more general problem of out-of-domain data. That is to say, there may be data that our model sees in production which is very different to what it saw during training. There isn’t really a complete technical solution to this problem; instead, we have to be careful about our approach to rolling out the technology.\nThere are other reasons we need to be careful too. One very common problem is domain shift, where the type of data that our model sees changes over time. For instance, an insurance company may use a deep learning model as part of its pricing and risk algorithm, but over time the types of customers that the company attracts, and the types of risks they represent, may change so much that the original training data is no longer relevant.\nOut-of-domain data and domain shift are examples of a larger problem: that you can never fully understand the entire behaviour of your neural network. They have far too many parameters to be able to analytically understand all of their possible behaviors. This is the natural downside of their best feature—their flexibility, which enables them to solve complex problems where we may not even be able to fully specify our preferred solution approaches. The good news, however, is that there are ways to mitigate these risks using a carefully thought-out process. The details of this will vary depending on the details of the problem you are solving, but we will attempt to lay out here a high-level approach, summarized in &lt;&gt;, which we hope will provide useful guidance.\n\nWhere possible, the first step is to use an entirely manual process, with your deep learning model approach running in parallel but not being used directly to drive any actions. The humans involved in the manual process should look at the deep learning outputs and check whether they make sense. For instance, with our bear classifier a park ranger could have a screen displaying video feeds from all the cameras, with any possible bear sightings simply highlighted in red. The park ranger would still be expected to be just as alert as before the model was deployed; the model is simply helping to check for problems at this point.\nThe second step is to try to limit the scope of the model, and have it carefully supervised by people. For instance, do a small geographically and time-constrained trial of the model-driven approach. Rather than rolling our bear classifier out in every national park throughout the country, we could pick a single observation post, for a one-week period, and have a park ranger check each alert before it goes out.\nThen, gradually increase the scope of your rollout. As you do so, ensure that you have really good reporting systems in place, to make sure that you are aware of any significant changes to the actions being taken compared to your manual process. For instance, if the number of bear alerts doubles or halves after rollout of the new system in some location, we should be very concerned. Try to think about all the ways in which your system could go wrong, and then think about what measure or report or picture could reflect that problem, and ensure that your regular reporting includes that information.\n\nUnforeseen Consequences and Feedback Loops\nOne of the biggest challenges in rolling out a model is that your model may change the behaviour of the system it is a part of. For instance, consider a “predictive policing” algorithm that predicts more crime in certain neighborhoods, causing more police officers to be sent to those neighborhoods, which can result in more crimes being recorded in those neighborhoods, and so on. In the Royal Statistical Society paper “To Predict and Serve?”, Kristian Lum and William Isaac observe that: “predictive policing is aptly named: it is predicting future policing, not future crime.”\nPart of the issue in this case is that in the presence of bias (which we’ll discuss in depth in the next chapter), feedback loops can result in negative implications of that bias getting worse and worse. For instance, there are concerns that this is already happening in the US, where there is significant bias in arrest rates on racial grounds. According to the ACLU, “despite roughly equal usage rates, Blacks are 3.73 times more likely than whites to be arrested for marijuana.” The impact of this bias, along with the rollout of predictive policing algorithms in many parts of the US, led Bärí Williams to write in the New York Times: “The same technology that’s the source of so much excitement in my career is being used in law enforcement in ways that could mean that in the coming years, my son, who is 7 now, is more likely to be profiled or arrested—or worse—for no reason other than his race and where we live.”\nA helpful exercise prior to rolling out a significant machine learning system is to consider this question: “What would happen if it went really, really well?” In other words, what if the predictive power was extremely high, and its ability to influence behavior was extremely significant? In that case, who would be most impacted? What would the most extreme results potentially look like? How would you know what was really going on?\nSuch a thought exercise might help you to construct a more careful rollout plan, with ongoing monitoring systems and human oversight. Of course, human oversight isn’t useful if it isn’t listened to, so make sure that there are reliable and resilient communication channels so that the right people will be aware of issues, and will have the power to fix them.",
+    "crumbs": [
+      "Saving a bear classifier Model"
+    ]
+  },
+  {
+    "objectID": "00-is-it-a-bird-creating-a-model-from-your-own-data.html",
+    "href": "00-is-it-a-bird-creating-a-model-from-your-own-data.html",
+    "title": "Is it a bird?",
+    "section": "",
+    "text": "The resources related are as following: 1. Lesson 1 lecture 2. Deep Learning for Coders with Fastai and PyTorch: AI Applications Without a PhD Chapter 1 3. Course notebooks\n# Suppress only UserWarning\nimport warnings\n\nwarnings.filterwarnings('ignore', category=UserWarning)\nDetect if notebook is running on Kaggle\nIt’s a good idea to ensure you’re running the latest version of any libraries you need. !pip install -Uqq &lt;libraries&gt; upgrades to the latest version of\nimport os\niskaggle = os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '')\n\nif iskaggle:\n    print('Is running on Kaggle.')\n    !pip install -Uqq fastai",
+    "crumbs": [
+      "Is it a bird?"
+    ]
+  },
+  {
+    "objectID": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-1-download-images-of-birds-and-non-birds",
+    "href": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-1-download-images-of-birds-and-non-birds",
+    "title": "Is it a bird?",
+    "section": "Step 1: Download images of birds and non-birds",
+    "text": "Step 1: Download images of birds and non-birds\n\n# Skip this cell if you already have duckduckgo_search installed\n!pip install -Uqq duckduckgo_search &gt; /dev/null\n!pip install -Uqq fastai &gt; /dev/null\n!pip install fastdownload  &gt; /dev/null\n\n\nfrom duckduckgo_search import DDGS \nfrom fastcore.all import *\n\ndef search_images(keywords, max_images=200): return L(DDGS().images(keywords, max_results=max_images)).itemgot('image')\n\nLet’s start by searching for a bird photo and seeing what kind of result we get. We’ll start by getting URLs from a search:\n\n# to test, we can run the following code\n\n#urls = search_images('bird photos', max_images=1)\n#urls[0]\n\n…and then download a URL and take a look at it:\n\ndest = 'bird.jpg'\nbird_path = Path(dest)\n\nif not bird_path.exists():\n    from fastdownload import download_url\n    download_url(urls[0], dest, show_progress=False)\n\nfrom fastai.vision.all import *\nim = Image.open(dest)\nim.to_thumb(256,256)\n\n\n\n\n\n\n\n\nNow let’s do the same with “forest photos”:\n\nforest_dest= 'forest.jpg'\nforest_path = Path(forest_dest)\n\nif not forest_path.exists():\n    download_url(search_images('forest photos', max_images=1)[0], forest_dest, show_progress=False)\n    \nImage.open(forest_dest).to_thumb(256,256)\n\n\n\n\n\n\n\n\nOur searches seem to be giving reasonable results, so let’s grab 200 examples of each of “bird” and “forest” photos, and save each group of photos to a different folder:\n\nsearches = 'forest','bird'\npath = Path('bird_or_not')\n\nfor o in searches:\n    dest = (path/o)\n\n    if dest.exists():\n        print(f\"Directory '{dest}' already exists. Skipping search, download, and resize for '{o}'.\")\n        continue # Skip the rest of this loop iteration and move to the next search term\n        \n    dest.mkdir(exist_ok=True, parents=True)\n    results = search_images(f'{o} photo')\n    download_images(dest, urls=results[:200])\n    time.sleep(5)\n    resize_images(dest, max_size=400, dest=dest)\n\nDirectory 'bird_or_not/forest' already exists. Skipping search, download, and resize for 'forest'.\nDirectory 'bird_or_not/bird' already exists. Skipping search, download, and resize for 'bird'.",
+    "crumbs": [
+      "Is it a bird?"
+    ]
+  },
+  {
+    "objectID": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-2-train-our-model",
+    "href": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-2-train-our-model",
+    "title": "Is it a bird?",
+    "section": "Step 2: Train our model",
+    "text": "Step 2: Train our model\nSome photos might not download correctly which could cause our model training to fail, so we’ll remove them:\n\nfailed = verify_images(get_image_files(path))\nfailed.map(Path.unlink)\nlen(failed)\n\n0\n\n\nTo train a model, we’ll need DataLoaders, which is an object that contains a training set (the images used to create a model) and a validation set (the images used to check the accuracy of a model – not used during training). In fastai we can create that easily using a DataBlock, and view sample images from it:\n\ndls = DataBlock(\n    blocks=(ImageBlock, CategoryBlock), \n    get_items=get_image_files, \n    splitter=RandomSplitter(valid_pct=0.2, seed=42),\n    get_y=parent_label,\n    item_tfms=[Resize(192, method='squish')]\n).dataloaders(path, bs=32)\n\ndls.show_batch(max_n=6)\n\n\n\n\n\n\n\n\n\nnum_bird_photos = len(get_image_files(path/'bird'))\nprint(f'{num_bird_photos} bird photos exist in dataset')\n\nnum_forest_photos = len(get_image_files(path/'forest'))\nprint(f'{num_forest_photos} forest photos exist in dataset')\n\n185 bird photos exist in dataset\n193 forest photos exist in dataset\n\n\nNow we’re ready to train our model. The fastest widely used computer vision model is resnet18. You can train this in a few minutes, even on a CPU! (On a GPU, it generally takes under 10 seconds…)\nfastai comes with a helpful fine_tune() method which automatically uses best practices for fine tuning a pre-trained model, so we’ll use that.\n\nmodel_path= Path('bird.pkl')\nmodel_existed=False\n\nif model_path.exists():\n    print(f\"Loading existing model weights from: {model_path}\")\n    # Load the saved weights into the existing learner structure\n    learn = load_learner('bird.pkl')    \n    learn.dls = dls\n        \n    model_existed=True\nelse:\n    learn = vision_learner(dls, resnet18, metrics=error_rate)\n    learn.fine_tune(3)\n    model_existed= False\n\nLoading existing model weights from: bird.pkl",
+    "crumbs": [
+      "Is it a bird?"
+    ]
+  },
+  {
+    "objectID": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-3-use-our-model-and-build-your-own",
+    "href": "00-is-it-a-bird-creating-a-model-from-your-own-data.html#step-3-use-our-model-and-build-your-own",
+    "title": "Is it a bird?",
+    "section": "Step 3: Use our model (and build your own!)",
+    "text": "Step 3: Use our model (and build your own!)\nLet’s see what our model thinks about that bird we downloaded at the start:\n\nis_bird,_,probs = learn.predict(PILImage.create('bird.jpg'))\nprint(f\"This is a: {is_bird}.\")\nprint(f\"Probability it's a bird: {probs[0]:.4f}\")\n\n\n\n\n\n\n\n\nThis is a: bird.\nProbability it's a bird: 1.0000\n\n\n\nif not model_existed:\n    learn.export('bird.pkl')",
+    "crumbs": [
+      "Is it a bird?"
+    ]
+  }
+]
